@@ -1,10 +1,11 @@
-module statusbar
+module todo
 
 go 1.17
 
 require (
 	github.com/gdamore/tcell/v2 v2.4.0
 	github.com/mattn/go-runewidth v0.0.13
+	github.com/oleiade/reflections v1.0.1
 	gopkg.in/yaml.v2 v2.4.0
 )
 
