@@ -59,11 +59,9 @@ func render_todos(s tcell.Screen, todos []map[string]interface{}) {
 	emitStr(s, 0, index, orange, "Add +")
 }
 
-func add_new_todo(s tcell.Screen,
-	new_todo string, todos []map[string]interface{}) []map[string]interface{} {
+func add_new_todo(s tcell.Screen, new_todo string) {
 	blue := tcell.StyleDefault.Foreground(tcell.ColorBlue)
 	emitStr(s, 0, 2, blue, "New Todo: " + new_todo)
-	return todos
 }
 
 func tick_todos(x int, y int, todos []map[string]interface{}) []map[string]interface{} {
@@ -210,12 +208,24 @@ func main() {
 				}
 			} else if ev.Key() == tcell.KeyRune {
 				if add_new {
-					atodos, _ := get_todos()
 					key_value := strings.Replace(strings.Replace(ev.Name(), "Rune[", "", 1), "]",
 						"", 1)
 					new_todo += key_value
-					add_new_todo(s,new_todo, atodos)
+					add_new_todo(s,new_todo)
 					add_new = true
+					s.Show()
+				}
+			} else if (ev.Key() == tcell.KeyBackspace2 || ev.Key() == tcell.KeyBackspace){
+				if len(new_todo) > 0 {
+					new_todo = strings.TrimSuffix(new_todo, new_todo[len(new_todo)-1:])
+					s.Clear()
+					add_new_todo(s, new_todo)
+					s.Show()
+				} else {
+					add_new = false
+					atodos, _ := get_todos()
+					s.Clear()
+					render_todos(s, atodos)
 					s.Show()
 				}
 			}
@@ -233,7 +243,7 @@ func main() {
 					s.Show()
 				} else if y == l + 1  {
 					s.Clear()
-					add_new_todo(s,new_todo, atodos)
+					add_new_todo(s,new_todo)
 					add_new = true
 					s.Show()
 				}
