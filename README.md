@@ -1,7 +1,7 @@
 
 # Todo
 
-![alt text](https://github.com/kyprifog/todo/blob/master/screenshot.png?raw=true)
+![Screenshot](https://github.com/kyprifog/todo/blob/master/images/screenshot.png)
 
 Todo is a minimal todo app with click interaction provided by tcell
 
