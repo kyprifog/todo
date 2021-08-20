@@ -62,7 +62,7 @@ func render_todos(s tcell.Screen, todos []map[string]interface{}) {
 func add_new_todo(s tcell.Screen,
 	new_todo string, todos []map[string]interface{}) []map[string]interface{} {
 	blue := tcell.StyleDefault.Foreground(tcell.ColorBlue)
-	emitStr(s, 0, 2, blue, new_todo)
+	emitStr(s, 0, 2, blue, "New Todo: " + new_todo)
 	return todos
 }
 
