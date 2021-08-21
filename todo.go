@@ -12,6 +12,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 var defStyle tcell.Style
@@ -169,7 +170,6 @@ func main() {
 		os.Exit(0)
 	}
 
-
 	render_todos(s, todos)
 	s.Show()
 
@@ -181,6 +181,7 @@ func main() {
 			events <- ev
 		}
 	}()
+	go func() {
 	for {
 		ev := <-events
 		switch ev := ev.(type) {
@@ -211,11 +212,11 @@ func main() {
 					key_value := strings.Replace(strings.Replace(ev.Name(), "Rune[", "", 1), "]",
 						"", 1)
 					new_todo += key_value
-					add_new_todo(s,new_todo)
+					add_new_todo(s, new_todo)
 					add_new = true
 					s.Show()
 				}
-			} else if (ev.Key() == tcell.KeyBackspace2 || ev.Key() == tcell.KeyBackspace){
+			} else if (ev.Key() == tcell.KeyBackspace2 || ev.Key() == tcell.KeyBackspace) {
 				if len(new_todo) > 0 {
 					new_todo = strings.TrimSuffix(new_todo, new_todo[len(new_todo)-1:])
 					s.Clear()
@@ -241,13 +242,27 @@ func main() {
 					render_todos(s, new_todos)
 					s.Sync()
 					s.Show()
-				} else if y == l + 1  {
+				} else if y == l+1 {
 					s.Clear()
-					add_new_todo(s,new_todo)
+					add_new_todo(s, new_todo)
 					add_new = true
 					s.Show()
 				}
 			}
+		}
+
+	}
+	}()
+
+	t := time.NewTicker(time.Second)
+	for {
+		select {
+		case <-t.C:
+			s.Clear()
+			atodos, _ := get_todos()
+			render_todos(s, atodos)
+			s.Sync()
+			s.Show()
 		}
 
 	}
