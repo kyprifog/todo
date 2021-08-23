@@ -258,11 +258,13 @@ func main() {
 	for {
 		select {
 		case <-t.C:
-			s.Clear()
-			atodos, _ := get_todos()
-			render_todos(s, atodos)
-			s.Sync()
-			s.Show()
+			if !add_new {
+				s.Clear()
+				atodos, _ := get_todos()
+				render_todos(s, atodos)
+				s.Sync()
+				s.Show()
+			}
 		}
 
 	}
