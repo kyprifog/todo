@@ -86,7 +86,7 @@ func sort_todo(todos []map[string]interface{}) [][]map[string]interface{}{
 func render_todos(s tcell.Screen, todos []map[string]interface{}) {
 	green := tcell.StyleDefault.Foreground(tcell.ColorLawnGreen)
 	yellow := tcell.StyleDefault.Foreground(tcell.ColorYellow)
-	sky_blue := tcell.StyleDefault.Foreground(tcell.ColorSkyblue)
+	sea_green := tcell.StyleDefault.Foreground(tcell.ColorDarkSeaGreen)
 	purple := tcell.StyleDefault.Foreground(tcell.ColorPurple)
 	grey := tcell.StyleDefault.Foreground(tcell.ColorGrey)
 	orange := tcell.StyleDefault.Foreground(tcell.ColorOrange)
@@ -105,7 +105,7 @@ func render_todos(s tcell.Screen, todos []map[string]interface{}) {
 
 	for _, el := range goal {
 		name := el["name"].(string)
-		emitStr(s, 0, index, sky_blue, "-- " + name + " --")
+		emitStr(s, 0, index, sea_green, "-- " + name + " --")
 		index += 1
 	}
 
