@@ -18,3 +18,6 @@ To toggle an item as done an item simply click it.  Press `(-)` while checked do
 delete it.
 
 Press Escape twice to exit
+
+# Special keywords
+`Shopping:`, `Goal:`, and `*` (corresponding to an important item) get formatting specially and the ordering is determined by this, Goals going first, then important items, then regular todos, then shopping items, and finally already finished items.
