@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 )
@@ -36,9 +37,57 @@ func emitStr(s tcell.Screen, x, y int, style tcell.Style, str string) {
 		x += w
 	}
 }
+func sort_list(todos []map[string]interface{}) {
+	sort.Slice(todos, func(i, j int) bool {
+		return todos[i]["name"].(string) < todos[j]["name"].(string)
+	})
+}
+
+func sort_todo(todos []map[string]interface{}) [][]map[string]interface{}{
+	goal := []map[string]interface{}{}
+	important := []map[string]interface{}{}
+	todo := []map[string]interface{}{}
+	shopping := []map[string]interface{}{}
+	done := []map[string]interface{}{}
+
+	for _, el := range todos {
+		name := el["name"].(string)
+		checked := el["done"].(bool)
+		if checked == true {
+			done = append(done, el)
+		} else if strings.Contains(name, "Goal:") {
+			goal = append(goal, el)
+		} else if strings.Contains(name, "*") {
+			important = append(important, el)
+		} else if strings.Contains(name, "Shopping:") {
+			shopping = append(shopping, el)
+		} else {
+			todo = append(todo, el)
+		}
+	}
+
+	sort_list(goal)
+	sort_list(important)
+	sort_list(shopping)
+	sort_list(todo)
+	sort_list(done)
+
+	all_todos := [][]map[string]interface{}{}
+
+	all_todos = append(all_todos, goal)
+	all_todos = append(all_todos, important)
+	all_todos = append(all_todos, todo)
+	all_todos = append(all_todos, shopping)
+	all_todos = append(all_todos, done)
+
+	return all_todos
+}
 
 func render_todos(s tcell.Screen, todos []map[string]interface{}) {
 	green := tcell.StyleDefault.Foreground(tcell.ColorLawnGreen)
+	yellow := tcell.StyleDefault.Foreground(tcell.ColorYellow)
+	sky_blue := tcell.StyleDefault.Foreground(tcell.ColorSkyblue)
+	purple := tcell.StyleDefault.Foreground(tcell.ColorPurple)
 	grey := tcell.StyleDefault.Foreground(tcell.ColorGrey)
 	orange := tcell.StyleDefault.Foreground(tcell.ColorOrange)
 	blue := tcell.StyleDefault.Foreground(tcell.ColorBlue)
@@ -47,16 +96,45 @@ func render_todos(s tcell.Screen, todos []map[string]interface{}) {
 
 	index := 1
 
-	for _, el := range todos {
+	all_todos := sort_todo(todos)
+	goal := all_todos[0]
+	important := all_todos[1]
+	todo := all_todos[2]
+	shopping := all_todos[3]
+	done := all_todos[4]
+
+	for _, el := range goal {
 		name := el["name"].(string)
-		checked := el["done"].(bool)
-		if checked == true {
-			emitStr(s, 0, index, grey, "[x] " + name + " (-)")
-		} else {
-			emitStr(s, 0, index, blue, "[ ] " + name)
-		}
+		emitStr(s, 0, index, sky_blue, "-- " + name + " --")
 		index += 1
 	}
+
+	for _, el := range important {
+		name := el["name"].(string)
+		emitStr(s, 0, index, yellow, "[ ] " + name)
+		index += 1
+	}
+
+	for _, el := range todo {
+		name := el["name"].(string)
+		emitStr(s, 0, index, blue, "[ ] " + name)
+		index += 1
+	}
+
+	for _, el := range shopping {
+		name := el["name"].(string)
+		emitStr(s, 0, index, purple, "[ ] " + name)
+		index += 1
+	}
+
+	for _, el := range done {
+		name := el["name"].(string)
+		emitStr(s, 0, index, grey, "[x] " + name + " (-)")
+		index += 1
+	}
+
+	emitStr(s, 0, index, blue, "")
+	index += 1
 	emitStr(s, 0, index, orange, "Add +")
 }
 
@@ -66,41 +144,65 @@ func add_new_todo(s tcell.Screen, new_todo string) {
 }
 
 func tick_todos(x int, y int, todos []map[string]interface{}) []map[string]interface{} {
-	new_todos := []map[string]interface{}{}
-	done_todos := []map[string]interface{}{}
-	undone_todos := []map[string]interface{}{}
-	for i, el := range todos {
-		checked := el["done"].(bool)
-		name := el["name"].(string)
-		if (1 + i) == y {
-			if checked == true {
-				if (len(name) + 6) != x {
-					el["done"] = false
-					undone_todos = append(undone_todos, el)
-				}
-			} else {
-				el["done"] = true
-				done_todos = append(done_todos, el)
+
+	sorted_todos := sort_todo(todos)
+	goal := sorted_todos[0]
+	important := sorted_todos[1]
+	todo := sorted_todos[2]
+	shopping := sorted_todos[3]
+	checked := sorted_todos[4]
+
+	all_todos := []map[string]interface{}{}
+
+	index := 1
+	for _, el := range goal {
+		if index == y {
+			el["done"] = true
+		}
+		index += 1
+		all_todos = append(all_todos, el)
+	}
+
+	for _, el := range important {
+		if index == y {
+			el["done"] = true
+		}
+		index += 1
+		all_todos = append(all_todos, el)
+	}
+
+	for _, el := range todo {
+		if index == y {
+			el["done"] = true
+		}
+		index += 1
+		all_todos = append(all_todos, el)
+	}
+
+	for _, el := range shopping {
+		if index == y {
+			el["done"] = true
+		}
+		index += 1
+		all_todos = append(all_todos, el)
+	}
+
+	for _, el := range checked {
+		if index == y {
+			name := el["name"].(string)
+			if (len(name) + 6) != x {
+				el["done"] = false
+				all_todos = append(all_todos, el)
+				index += 1
 			}
 		} else {
-			if checked == true {
-				done_todos = append(done_todos, el)
-			} else {
-				undone_todos = append(undone_todos, el)
-			}
+			all_todos = append(all_todos, el)
+			index += 1
 		}
 	}
 
-	for _, el2 := range undone_todos {
-		new_todos = append(new_todos, el2)
-	}
-
-	for _, el3 := range done_todos {
-		new_todos = append(new_todos, el3)
-	}
-
-	save_todos(new_todos)
-	return new_todos
+	save_todos(all_todos)
+	return all_todos
 }
 
 func save_todos(todos []map[string]interface{}) {
@@ -133,8 +235,6 @@ func get_todos() ([]map[string]interface{}, error) {
 	return todos.ToDos, err
 }
 
-
-
 func main() {
 
 	s, e := tcell.NewScreen()
@@ -150,9 +250,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	defStyle = tcell.StyleDefault.
-		Background(tcell.ColorReset).
-		Foreground(tcell.ColorReset)
+	defStyle = tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorReset)
 
 	s.SetStyle(defStyle)
 	s.EnableMouse()
@@ -236,13 +334,13 @@ func main() {
 			case tcell.Button1, tcell.Button2, tcell.Button3:
 				atodos, _ := get_todos()
 				l := len(atodos)
-				if y < (l + 1) {
+				if y < (l + 2) {
 					s.Clear()
-					new_todos := tick_todos(x, y, atodos)
-					render_todos(s, new_todos)
-					s.Sync()
+					tick_todos(x, y, atodos)
+					todos, _ := get_todos()
+					render_todos(s, todos)
 					s.Show()
-				} else if y == l+1 {
+				} else if y == l+2 {
 					s.Clear()
 					add_new_todo(s, new_todo)
 					add_new = true
