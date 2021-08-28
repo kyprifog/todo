@@ -14,7 +14,7 @@ touch ~/.todos.yaml
 ```
 Press `Add +` to add a new item, type your new item and press enter to add it.
 
-To toggle an item as done an item simply click it.  Press `(-)` while checked done to permanently 
+To toggle an item as done simply click it.  Press `(-)` while checked done to permanently 
 delete it.
 
 Press Escape twice to exit
