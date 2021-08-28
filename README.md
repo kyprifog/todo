@@ -3,7 +3,7 @@
 
 ![Screenshot](https://github.com/kyprifog/todo/blob/master/images/screenshot.png)
 
-Todo is a minimal todo app with click interaction provided by tcell
+Todo is a minimal todo app with click interaction provided by ![tcell](https://github.com/gdamore/tcell)
 
 # Usage
 
