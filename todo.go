@@ -190,7 +190,7 @@ func tick_todos(x int, y int, todos []map[string]interface{}) []map[string]inter
 	for _, el := range checked {
 		if index == y {
 			name := el["name"].(string)
-			if (len(name) + 6) != x {
+			if (len(name) + 6) <= x {
 				el["done"] = false
 				all_todos = append(all_todos, el)
 				index += 1
