@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/user"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -19,9 +18,7 @@ import (
 var defStyle tcell.Style
 
 func todos_path() string {
-	usr, _ := user.Current()
-	dir := usr.HomeDir
-	return filepath.Join(dir, "/.todos.yaml")
+	return filepath.Join(os.Args[1])
 }
 
 func emitStr(s tcell.Screen, x, y int, style tcell.Style, str string) {
@@ -193,12 +190,11 @@ func tick_todos(x int, y int, todos []map[string]interface{}) []map[string]inter
 			if (len(name) + 4) >= x {
 				el["done"] = false
 				all_todos = append(all_todos, el)
-				index += 1
 			}
 		} else {
 			all_todos = append(all_todos, el)
-			index += 1
 		}
+		index += 1
 	}
 
 	save_todos(all_todos)
